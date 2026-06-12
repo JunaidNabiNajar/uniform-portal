@@ -19,6 +19,7 @@ export type OrderWithItems = {
   id: string
   status: string
   total: number
+  paymentMethod: string
   shippingName: string
   shippingAddress: string
   shippingCity: string

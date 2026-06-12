@@ -10,6 +10,7 @@ type OrderWithItems = {
   id: string
   status: string
   total: number
+  paymentMethod: string
   shippingName: string
   shippingAddress: string
   shippingCity: string
@@ -83,8 +84,6 @@ export default function AdminOrderDetailPage({
     )
   }
 
-  const statusOptions = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]
-
   return (
     <div className="p-6 max-w-3xl">
       <Link
@@ -103,22 +102,56 @@ export default function AdminOrderDetailPage({
           <p className="text-sm text-gray-500 mt-1">
             Placed on {new Date(order.createdAt).toLocaleDateString()} by {order.user.email}
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <select
-            value={order.status}
-            onChange={(e) => updateStatus(e.target.value)}
-            disabled={updating}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
-          >
-            {statusOptions.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+          <span className={`mt-2 inline-block px-3 py-1 rounded-full text-sm font-medium ${
+            order.status === "PENDING" ? "bg-yellow-100 text-yellow-800" :
+            order.status === "PROCESSING" ? "bg-blue-100 text-blue-800" :
+            order.status === "SHIPPED" ? "bg-purple-100 text-purple-800" :
+            order.status === "DELIVERED" ? "bg-green-100 text-green-800" :
+            order.status === "CANCELLED" ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-800"
+          }`}>
+            {order.status}
+          </span>
         </div>
       </div>
+
+      {order.status !== "CANCELLED" && order.status !== "DELIVERED" && (
+        <div className="mt-6 flex flex-wrap gap-3">
+          {order.status === "PENDING" && (
+            <button
+              onClick={() => updateStatus("PROCESSING")}
+              disabled={updating}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 text-sm font-medium"
+            >
+              Accept Order
+            </button>
+          )}
+          {order.status === "PROCESSING" && (
+            <button
+              onClick={() => updateStatus("SHIPPED")}
+              disabled={updating}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300 text-sm font-medium"
+            >
+              Mark as Shipped
+            </button>
+          )}
+          {order.status === "SHIPPED" && (
+            <button
+              onClick={() => updateStatus("DELIVERED")}
+              disabled={updating}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 text-sm font-medium"
+            >
+              Mark as Delivered
+            </button>
+          )}
+          <button
+            onClick={() => updateStatus("CANCELLED")}
+            disabled={updating}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-gray-300 text-sm font-medium"
+          >
+            Cancel Order
+          </button>
+        </div>
+      )}
 
       <div className="mt-8 bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900">Items</h2>
@@ -153,6 +186,19 @@ export default function AdminOrderDetailPage({
               </div>
             )
           })}
+        </div>
+      </div>
+
+      <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900">Payment</h2>
+        <div className="mt-4">
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+            order.paymentMethod === "SCAN_PAY"
+              ? "bg-indigo-100 text-indigo-800"
+              : "bg-green-100 text-green-800"
+          }`}>
+            {order.paymentMethod === "SCAN_PAY" ? "Scan & Pay" : "Cash on Delivery"}
+          </span>
         </div>
       </div>
 

@@ -1,18 +1,47 @@
-import { auth } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-import { redirect } from "next/navigation"
+"use client"
+
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Plus, Pencil } from "lucide-react"
+import { Plus, Pencil, Trash2 } from "lucide-react"
 import { formatPrice } from "@/lib/utils"
+import type { ProductWithCategory } from "@/types"
 
-export default async function AdminProductsPage() {
-  const session = await auth()
-  if (!session?.user || session.user.role !== "ADMIN") redirect("/auth/signin")
+export default function AdminProductsPage() {
+  const router = useRouter()
+  const [products, setProducts] = useState<ProductWithCategory[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const products = await prisma.product.findMany({
-    include: { category: true },
-    orderBy: { createdAt: "desc" },
-  })
+  const fetchProducts = () => {
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then((data) => {
+        setProducts(data)
+        setLoading(false)
+      })
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return
+    const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" })
+    if (res.ok) {
+      fetchProducts()
+    } else {
+      alert("Failed to delete product")
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+      </div>
+    )
+  }
 
   return (
     <div className="p-6">
@@ -56,13 +85,22 @@ export default async function AdminProductsPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <Link
-                    href={`/admin/products/${product.id}/edit`}
-                    className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm"
-                  >
-                    <Pencil className="w-3 h-3" />
-                    Edit
-                  </Link>
+                  <div className="flex items-center justify-end gap-2">
+                    <Link
+                      href={`/admin/products/${product.id}/edit`}
+                      className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(product.id, product.name)}
+                      className="inline-flex items-center gap-1 text-red-600 hover:text-red-800 text-sm"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      Delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

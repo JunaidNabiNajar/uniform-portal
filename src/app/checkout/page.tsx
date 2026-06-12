@@ -4,15 +4,18 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
-import { ShoppingBag, ArrowLeft } from "lucide-react"
+import { ShoppingBag, ArrowLeft, QrCode, Banknote } from "lucide-react"
 import { useCartStore } from "@/store/cart"
 import { formatPrice } from "@/lib/utils"
+
+type PaymentMethod = "SCAN_PAY" | "COD"
 
 export default function CheckoutPage() {
   const { data: session } = useSession()
   const router = useRouter()
   const { items, total, clearCart } = useCartStore()
   const [submitting, setSubmitting] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("COD")
   const [form, setForm] = useState({
     shippingName: "",
     shippingAddress: "",
@@ -60,7 +63,7 @@ export default function CheckoutPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, paymentMethod }),
       })
 
       if (!res.ok) {
@@ -72,7 +75,12 @@ export default function CheckoutPage() {
 
       const order = await res.json()
       clearCart()
-      router.push(`/orders/${order.id}`)
+
+      if (paymentMethod === "SCAN_PAY") {
+        router.push(`/orders/${order.id}?payment=scan`)
+      } else {
+        router.push(`/orders/${order.id}`)
+      }
     } catch {
       alert("Something went wrong")
       setSubmitting(false)
@@ -147,6 +155,46 @@ export default function CheckoutPage() {
                   className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
                 />
               </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold text-gray-900">Payment Method</h2>
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => setPaymentMethod("SCAN_PAY")}
+                className={`flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all ${
+                  paymentMethod === "SCAN_PAY"
+                    ? "border-indigo-600 bg-indigo-50"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <div className={`p-2 rounded-lg ${paymentMethod === "SCAN_PAY" ? "bg-indigo-100" : "bg-gray-100"}`}>
+                  <QrCode className={`w-6 h-6 ${paymentMethod === "SCAN_PAY" ? "text-indigo-600" : "text-gray-600"}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">Scan & Pay</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Pay via UPI, GPay, PhonePe</p>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaymentMethod("COD")}
+                className={`flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all ${
+                  paymentMethod === "COD"
+                    ? "border-indigo-600 bg-indigo-50"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <div className={`p-2 rounded-lg ${paymentMethod === "COD" ? "bg-indigo-100" : "bg-gray-100"}`}>
+                  <Banknote className={`w-6 h-6 ${paymentMethod === "COD" ? "text-indigo-600" : "text-gray-600"}`} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">Cash on Delivery</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Pay when order arrives</p>
+                </div>
+              </button>
             </div>
           </div>
 

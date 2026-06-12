@@ -131,6 +131,65 @@ export default async function OrderDetailPage({
       </div>
 
       <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900">Payment</h2>
+        <div className="mt-4 flex items-center gap-3">
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+            order.paymentMethod === "SCAN_PAY"
+              ? "bg-indigo-100 text-indigo-800"
+              : "bg-green-100 text-green-800"
+          }`}>
+            {order.paymentMethod === "SCAN_PAY" ? "Scan & Pay" : "Cash on Delivery"}
+          </span>
+          {order.paymentMethod === "SCAN_PAY" && order.status === "PENDING" && (
+            <span className="text-xs text-yellow-600 font-medium">Awaiting Payment</span>
+          )}
+          {order.paymentMethod === "SCAN_PAY" && order.status !== "PENDING" && order.status !== "CANCELLED" && (
+            <span className="text-xs text-green-600 font-medium">Paid</span>
+          )}
+        </div>
+
+        {order.paymentMethod === "SCAN_PAY" && order.status === "PENDING" && (
+          <div className="mt-4 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
+            <p className="text-sm font-medium text-indigo-900">Complete your payment</p>
+            <p className="text-xs text-indigo-700 mt-1">
+              Scan the QR code below using any UPI app (GPay, PhonePe, PayTM) to pay{" "}
+              <strong>{formatPrice(order.total)}</strong>.
+            </p>
+            <div className="mt-4 flex justify-center">
+              <div className="bg-white p-4 rounded-xl shadow-sm">
+                <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <svg className="w-32 h-32 mx-auto text-gray-800" viewBox="0 0 100 100">
+                      <rect x="5" y="5" width="38" height="38" fill="currentColor" rx="4" />
+                      <rect x="57" y="5" width="38" height="38" fill="currentColor" rx="4" />
+                      <rect x="5" y="57" width="38" height="38" fill="currentColor" rx="4" />
+                      <rect x="30" y="30" width="15" height="15" fill="#fff" rx="2" />
+                      <rect x="55" y="55" width="15" height="15" fill="#fff" rx="2" />
+                      <rect x="30" y="55" width="10" height="10" fill="#fff" rx="1" />
+                      <rect x="55" y="30" width="10" height="10" fill="#fff" rx="1" />
+                      <rect x="20" y="60" width="8" height="8" fill="#fff" rx="1" />
+                      <rect x="60" y="20" width="8" height="8" fill="#fff" rx="1" />
+                      <rect x="7" y="49" width="36" height="4" fill="currentColor" />
+                      <rect x="49" y="49" width="6" height="4" fill="currentColor" />
+                      <rect x="59" y="49" width="36" height="4" fill="currentColor" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 text-center">
+              <p className="text-xs font-mono text-indigo-800 bg-indigo-100 px-3 py-1.5 rounded-lg inline-block">
+                uniform@upi
+              </p>
+            </div>
+            <p className="mt-3 text-xs text-gray-500 text-center">
+              The order will be processed once payment is confirmed.
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6">
         <div className="flex justify-between text-lg font-semibold text-gray-900">
           <span>Total</span>
           <span>{formatPrice(order.total)}</span>

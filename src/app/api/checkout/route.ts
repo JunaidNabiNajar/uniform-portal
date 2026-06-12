@@ -8,12 +8,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const { shippingName, shippingAddress, shippingCity, shippingState, shippingZip, shippingPhone } =
+  const { shippingName, shippingAddress, shippingCity, shippingState, shippingZip, shippingPhone, paymentMethod } =
     await req.json()
 
   if (!shippingName || !shippingAddress || !shippingCity || !shippingState || !shippingZip) {
     return NextResponse.json(
       { error: "All shipping fields are required" },
+      { status: 400 }
+    )
+  }
+
+  if (!paymentMethod || !["SCAN_PAY", "COD"].includes(paymentMethod)) {
+    return NextResponse.json(
+      { error: "Valid payment method is required" },
       { status: 400 }
     )
   }
@@ -37,6 +44,7 @@ export async function POST(req: Request) {
       userId: session.user.id,
       status: "PENDING",
       total,
+      paymentMethod,
       shippingName,
       shippingAddress,
       shippingCity,
