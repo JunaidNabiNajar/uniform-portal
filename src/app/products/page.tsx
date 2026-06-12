@@ -2,6 +2,8 @@ import { Metadata } from "next"
 import { prisma } from "@/lib/prisma"
 import ProductCard from "@/components/ProductCard"
 
+export const dynamic = "force-dynamic"
+
 export const metadata: Metadata = {
   title: "Catalog - UniformPortal",
   description: "Browse our complete collection of uniforms.",
