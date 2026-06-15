@@ -6,7 +6,7 @@ import { ChevronLeft } from "lucide-react"
 import { formatPrice, parseImageString } from "@/lib/utils"
 
 export const metadata: Metadata = {
-  title: "Order Details - UniformPortal",
+  title: "Order Details - SSS Online Shopping",
 }
 
 export default async function OrderDetailPage({

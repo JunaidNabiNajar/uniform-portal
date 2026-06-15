@@ -5,7 +5,7 @@ import Link from "next/link"
 import { formatPrice } from "@/lib/utils"
 
 export const metadata: Metadata = {
-  title: "My Orders - UniformPortal",
+  title: "My Orders - SSS Online Shopping",
 }
 
 export default async function OrdersPage() {

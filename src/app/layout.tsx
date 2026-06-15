@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "UniformPortal - Premium Uniforms",
-  description: "Shop premium school and corporate uniforms online.",
+  title: "SSS Online Shopping - Premium Uniforms",
+  description: "Shop premium school and corporate uniforms online at SSS.",
 }
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-gray-50">
+      <body className="min-h-full flex flex-col bg-gradient-to-br from-slate-50 via-white to-indigo-50/30">
         <SessionProvider>
           <Header />
           <main className="flex-1">{children}</main>

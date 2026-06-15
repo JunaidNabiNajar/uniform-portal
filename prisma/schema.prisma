@@ -22,6 +22,7 @@ model User {
   sessions  Session[]
   orders    Order[]
   cartItems CartItem[]
+  reviews   Review[]
 }
 
 model Account {
@@ -85,6 +86,7 @@ model Product {
   category   Category   @relation(fields: [categoryId], references: [id])
   cartItems  CartItem[]
   orderItems OrderItem[]
+  reviews    Review[]
 }
 
 model CartItem {
@@ -133,4 +135,18 @@ model OrderItem {
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String
   product   Product @relation(fields: [productId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
 }

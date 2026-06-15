@@ -1,5 +1,6 @@
 export function formatPrice(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`
+  const rupees = Math.round(cents / 100)
+  return `₹${rupees.toLocaleString("en-IN")}`
 }
 
 export function parseSizeString(sizes: string): string[] {
